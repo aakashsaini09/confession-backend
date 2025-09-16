@@ -5,7 +5,6 @@ let liveUsers = 0;
 
 export default function initSocket(httpServer) {
   const io = new SocketIOServer(httpServer, {
-    path: "/socket", // changed from /api/socket
     cors: { origin: "*", methods: ["GET", "POST"] },
   });
 
