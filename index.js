@@ -1,22 +1,34 @@
-// index.js
-import express from "express";
-import { createServer } from "http";
-import initSocket from './src/socket.js'
+// src/socket.js
+import { Server as SocketIOServer } from "socket.io";
 
-const app = express();
-const port = 8000;
+let liveUsers = 0;
 
-// Create an HTTP server
-const httpServer = createServer(app);
+export default function initSocket(httpServer) {
+  const io = new SocketIOServer(httpServer, {
+    cors: {
+      origin: "*",          // for testing, allow all
+      methods: ["GET", "POST"]
+    }
+  });
 
-// Initialize socket.io
-initSocket(httpServer);
+  io.on("connection", (socket) => {
+    liveUsers++;
+    console.log("✅ User connected:", socket.id);
 
-app.get("/", (req, res) => {
-  console.log("Hello this msg for console");
-  res.send("Hello World!");
-});
+    io.emit("users-count", liveUsers);
 
-httpServer.listen(port, () => {
-  console.log(`🚀 Server running at http://localhost:${port}`);
-});
+    socket.on("chat-message", (text) => {
+      const message = { id: socket.id, text };
+      console.log("💬 Message:", message);
+      io.emit("chat-message", message);
+    });
+
+    socket.on("disconnect", () => {
+      liveUsers--;
+      console.log("❌ User disconnected:", socket.id);
+      io.emit("users-count", liveUsers);
+    });
+  });
+
+  console.log("🚀 Socket.io server started");
+}
