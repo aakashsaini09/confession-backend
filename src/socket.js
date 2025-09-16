@@ -5,7 +5,10 @@ let liveUsers = 0;
 
 export default function initSocket(httpServer) {
   const io = new SocketIOServer(httpServer, {
-    cors: { origin: "*", methods: ["GET", "POST"] },
+    cors: {
+      origin: "*",          // for testing, allow all
+      methods: ["GET", "POST"]
+    }
   });
 
   io.on("connection", (socket) => {
