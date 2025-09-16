@@ -4,6 +4,7 @@ import { createServer } from "http";
 import initSocket from './src/socket.js'
 
 const app = express();
+app.use(cors())
 const port = 8000;
 
 // Create an HTTP server
